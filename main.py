@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 '''
 @File    :   main.py
 @Time    :   2019/02/02 10:14:03

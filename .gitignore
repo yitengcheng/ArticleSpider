@@ -8,6 +8,8 @@
 /ArticleSpider/__pycache__
 /ArticleSpider/cookies
 /ArticleSpider/spiders/__pycache__
+/ArticleSpider/utils/__pycache__
+/ArticleSpider/tools/__pycache__
 
 # testing
 /coverage

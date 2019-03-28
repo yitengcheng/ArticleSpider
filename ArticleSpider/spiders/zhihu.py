@@ -26,7 +26,7 @@ class ZhihuSpider(scrapy.Spider):
         chrome_option.add_experimental_option(
             'debuggerAddress', '127.0.0.1:9222')
         browser = webdriver.Chrome(
-            executable_path='E:/chromdriver/chromedriver.exe', chrome_options=chrome_option)
+            executable_path='/usr/bin/chromedriver', chrome_options=chrome_option)
         try:
             browser.maximize_window()
         except:
