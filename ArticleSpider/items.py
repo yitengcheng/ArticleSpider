@@ -24,8 +24,7 @@ def add_jobbole(value):
 
 def date_convert(value):
     try:
-        create_date = datetime.datetime.strftime(
-            value, '%Y/%m/%d').date()
+        create_date = datetime.datetime.strftime(value, '%Y/%m/%d').date()
     except Exception as e:
         create_date = datetime.datetime.now().date()
     return create_date
@@ -58,30 +57,18 @@ class ArticleItemLoader(ItemLoader):
 
 
 class JobBoleArticleItem(scrapy.Item):
-    title = scrapy.Field(
-        input_processor=MapCompose(add_jobbole)
-    )
-    create_date = scrapy.Field(
-        input_processor=MapCompose(date_convert)
-    )
+    title = scrapy.Field(input_processor=MapCompose(add_jobbole))
+    create_date = scrapy.Field(input_processor=MapCompose(date_convert))
     url = scrapy.Field()
     url_object_id = scrapy.Field()
-    img_url = scrapy.Field(
-        output_processor=MapCompose(return_value))
+    img_url = scrapy.Field(output_processor=MapCompose(return_value))
     img_path = scrapy.Field()
-    praise_nums = scrapy.Field(
-        input_processor=MapCompose(get_nums)
-    )
-    fav_nums = scrapy.Field(
-        input_processor=MapCompose(get_nums)
-    )
-    comments_nums = scrapy.Field(
-        input_processor=MapCompose(get_nums)
-    )
+    praise_nums = scrapy.Field(input_processor=MapCompose(get_nums))
+    fav_nums = scrapy.Field(input_processor=MapCompose(get_nums))
+    comments_nums = scrapy.Field(input_processor=MapCompose(get_nums))
     tags = scrapy.Field(
         input_processor=MapCompose(remove_comment_tags),
-        output_processor=Join(',')
-    )
+        output_processor=Join(','))
     content = scrapy.Field()
 
 
@@ -90,3 +77,17 @@ class CaoLiuArticleItem(scrapy.Item):
     img_url = scrapy.Field()
     img_name = scrapy.Field()
     img_path = scrapy.Field()
+
+
+class ZhihuQuestionItem(scrapy.Item):
+    # 知乎的问题 item
+    zhihu_id = scrapy.Field()
+    topics = scrapy.Field()
+    url = scrapy.Field()
+    title = scrapy.Field()
+    content = scrapy.Field()
+    answer_num = scrapy.Field()
+    comments_num = scrapy.Field()
+    watch_user_num = scrapy.Field()
+    click_num = scrapy.Field()
+    crawl_time = scrapy.Field()
