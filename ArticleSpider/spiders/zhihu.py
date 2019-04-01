@@ -11,12 +11,16 @@ from zheye import zheye
 from tools.yundama_requests import YDMHttp
 from urllib import parse
 import re
+from scrapy.loader import ItemLoader
+from ArticleSpider.items import ZhihuAnswerItem, ZhihuQuestionItem
 
 
 class ZhihuSpider(scrapy.Spider):
     name = 'zhihu'
     allowed_domains = ['www.zhihu.com']
     start_urls = ['http://www.zhihu.com/']
+    # question的第一頁answer的請求url
+    start_answer_url = 'ttps://www.zhihu.com/api/v4/questions/{0}/answers?include=data[*].is_normal,admin_closed_comment,reward_info,is_collapsed,annotation_action,annotation_detail,collapse_reason,is_sticky,collapsed_by,suggest_edit,comment_count,can_comment,content,editable_content,voteup_count,reshipment_settings,comment_permission,created_time,updated_time,review_info,relevant_info,question,excerpt,relationship.is_authorized,is_author,voting,is_thanked,is_nothelp,is_labeled,is_recognized,paid_info;data[*].mark_infos[*].url;data[*].author.follower_count,badge[*].topics&offset={2}&limit={1}&sort_by=default&platform=desktop'
 
     def parse(self, response):
         """
@@ -28,16 +32,37 @@ class ZhihuSpider(scrapy.Spider):
         all_urls = filter(lambda x: True if x.startswith("https") else False,
                           all_urls)
         for url in all_urls:
-            print(url)
-            match_obj = re.match('(.*zhihu.com/question/(\d+))(/|$).*', url)
+            match_obj = re.match(r'(.*zhihu.com/question/(\d+))(/|$).*', url)
             if match_obj:
+                # 如果提取到question相关页面则下载后交由提取函数进行提取
                 request_url = match_obj.group(1)
                 question_id = match_obj.group(2)
-                yield scrapy.Request(request_url, callback=self.parse_question)
+                yield scrapy.Request(
+                    request_url,
+                    callback=self.parse_question,
+                    meta={'zhihu_id': question_id})
+            else:
+                # 如果不是question页面则直接进一步跟踪
+                yield scrapy.Request(url)
 
     def parse_question(self, response):
         # 处理question页面，从页面中提取出具体的question item
-        pass
+        zhihu_id = response.meta.get('zhihu_id', '')
+        item_loader = ItemLoader(item=ZhihuQuestionItem(), response=response)
+        item_loader.add_css('title', 'h1.QuestionHeader-title::text')
+        item_loader.add_css('content', 'div.QuestionHeader-detail')
+        item_loader.add_value('url', response.url)
+        item_loader.add_value('zhihu_id', zhihu_id)
+        item_loader.add_css('answer_num', '.List-headerText span::text')
+        item_loader.add_css('comments_num',
+                            '.QuestionHeader-Comment button::text')
+        item_loader.add_css(
+            'watch_user_num',
+            '.Button.NumberBoard-item.Button--plain div strong::text')
+        item_loader.add_css('topics',
+                            '.QuestionHeader-topics .Popover div::text')
+        question_item = item_loader.load_item()
+        yield question_item
 
     def start_requests(self):
         chrome_option = Options()
@@ -79,7 +104,7 @@ class ZhihuSpider(scrapy.Spider):
                 pickle.dump(cookie, f)
                 f.close()
                 cookie_dict[cookie['name']] = cookie['value']
-            browser.close()
+            # browser.close()
             return [
                 scrapy.Request(
                     url=self.start_urls[0],
