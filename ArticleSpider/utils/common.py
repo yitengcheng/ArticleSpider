@@ -4,13 +4,14 @@
 @Time    :   2019/02/17 22:34:22
 @Author  :   fan zehua
 @Version :   1.0
-@Contact :   raogx.vip@hotmail.com
+@Contact :   316679581@qq.com
 @License :   (C)Copyright 2017-2018, Liugroup-NLPR-CASIA
 @Desc    :   None
 '''
 
 # here put the import lib
 import hashlib
+
 # MD5摘要生成
 
 

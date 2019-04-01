@@ -4,7 +4,7 @@
 @Time    :   2019/02/22 22:02:22
 @Author  :   fan zehua 
 @Version :   1.0
-@Contact :   raogx.vip@hotmail.com
+@Contact :   316679581@qq.com
 @License :   (C)Copyright 2017-2018, Liugroup-NLPR-CASIA
 @Desc    :   None
 '''
@@ -24,9 +24,11 @@ browser.find_element_by_xpath(
     '//*[@id="root"]/div/main/div/div/div/div[2]/div[2]/span').click()
 # send_keys()向目标节点输入内容
 browser.find_element_by_xpath(
-    '//*[@id="root"]/div/main/div/div/div/div[2]/div[1]/form/div[1]/div[2]/div[1]/input').send_keys('13984387205')
+    '//*[@id="root"]/div/main/div/div/div/div[2]/div[1]/form/div[1]/div[2]/div[1]/input'
+).send_keys('13984387205')
 browser.find_element_by_xpath(
-    '//*[@id="root"]/div/main/div/div/div/div[2]/div[1]/form/div[2]/div/div[1]/input').send_keys('energy2fan')
+    '//*[@id="root"]/div/main/div/div/div/div[2]/div[1]/form/div[2]/div/div[1]/input'
+).send_keys('energy2fan')
 browser.find_element_by_xpath(
     '//*[@id="root"]/div/main/div/div/div/div[2]/div[1]/form/button').click()
 

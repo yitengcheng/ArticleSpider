@@ -4,7 +4,7 @@
 @Time    :   2019/03/11 21:17:26
 @Author  :   fan zehua 
 @Version :   1.0
-@Contact :   raogx.vip@hotmail.com
+@Contact :   316679581@qq.com
 @License :   (C)Copyright 2017-2018, Liugroup-NLPR-CASIA
 @Desc    :   None
 '''
