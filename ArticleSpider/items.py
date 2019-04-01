@@ -25,7 +25,7 @@ def add_jobbole(value):
 def date_convert(value):
     try:
         create_date = datetime.datetime.strftime(value, '%Y/%m/%d').date()
-    except Exception as e:
+    except:
         create_date = datetime.datetime.now().date()
     return create_date
 
@@ -90,4 +90,18 @@ class ZhihuQuestionItem(scrapy.Item):
     comments_num = scrapy.Field()
     watch_user_num = scrapy.Field()
     click_num = scrapy.Field()
+    crawl_time = scrapy.Field()
+
+
+class ZhihuAnswerItem(scrapy.Item):
+    # 知乎的问题回答item
+    zhihu_id = scrapy.Field()
+    url = scrapy.Field()
+    question_id = scrapy.Field()
+    author_id = scrapy.Field()
+    content = scrapy.Field()
+    parise_num = scrapy.Field()
+    comments_num = scrapy.Field()
+    create_time = scrapy.Field()
+    update_time = scrapy.Field()
     crawl_time = scrapy.Field()
