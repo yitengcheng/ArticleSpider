@@ -13,6 +13,8 @@ from urllib import parse
 import re
 from scrapy.loader import ItemLoader
 from ArticleSpider.items import ZhihuAnswerItem, ZhihuQuestionItem
+import json
+import datetime
 
 
 class ZhihuSpider(scrapy.Spider):
@@ -20,7 +22,9 @@ class ZhihuSpider(scrapy.Spider):
     allowed_domains = ['www.zhihu.com']
     start_urls = ['http://www.zhihu.com/']
     # question的第一頁answer的請求url
-    start_answer_url = 'ttps://www.zhihu.com/api/v4/questions/{0}/answers?include=data[*].is_normal,admin_closed_comment,reward_info,is_collapsed,annotation_action,annotation_detail,collapse_reason,is_sticky,collapsed_by,suggest_edit,comment_count,can_comment,content,editable_content,voteup_count,reshipment_settings,comment_permission,created_time,updated_time,review_info,relevant_info,question,excerpt,relationship.is_authorized,is_author,voting,is_thanked,is_nothelp,is_labeled,is_recognized,paid_info;data[*].mark_infos[*].url;data[*].author.follower_count,badge[*].topics&offset={2}&limit={1}&sort_by=default&platform=desktop'
+    start_answer_url = (
+        'https://www.zhihu.com/api/v4/questions/{0}/answers?include=data[*].is_normal,admin_closed_comment,reward_info,is_collapsed,annotation_action,annotation_detail,collapse_reason,is_sticky,collapsed_by,suggest_edit,comment_count,can_comment,content,editable_content,voteup_count,reshipment_settings,comment_permission,created_time,updated_time,review_info,relevant_info,question,excerpt,relationship.is_authorized,is_author,voting,is_thanked,is_nothelp,is_labeled,is_recognized,paid_info;data[*].mark_infos[*].url;data[*].author.follower_count,badge[*].topics&offset={2}&limit={1}&sort_by=default&platform=desktop'
+    )
 
     def parse(self, response):
         """
@@ -41,18 +45,18 @@ class ZhihuSpider(scrapy.Spider):
                     request_url,
                     callback=self.parse_question,
                     meta={'zhihu_id': question_id})
-            else:
-                # 如果不是question页面则直接进一步跟踪
-                yield scrapy.Request(url)
+            # else:
+            #     # 如果不是question页面则直接进一步跟踪
+            #     yield scrapy.Request(url)
 
     def parse_question(self, response):
         # 处理question页面，从页面中提取出具体的question item
-        zhihu_id = response.meta.get('zhihu_id', '')
+        question_id = response.meta.get('zhihu_id', '')
         item_loader = ItemLoader(item=ZhihuQuestionItem(), response=response)
         item_loader.add_css('title', 'h1.QuestionHeader-title::text')
         item_loader.add_css('content', 'div.QuestionHeader-detail')
         item_loader.add_value('url', response.url)
-        item_loader.add_value('zhihu_id', zhihu_id)
+        item_loader.add_value('zhihu_id', question_id)
         item_loader.add_css('answer_num', '.List-headerText span::text')
         item_loader.add_css('comments_num',
                             '.QuestionHeader-Comment button::text')
@@ -62,7 +66,38 @@ class ZhihuSpider(scrapy.Spider):
         item_loader.add_css('topics',
                             '.QuestionHeader-topics .Popover div::text')
         question_item = item_loader.load_item()
+        yield scrapy.Request(
+            self.start_answer_url.format(question_id, 20, 0),
+            callback=self.parse_answer)
         yield question_item
+
+    def parse_answer(self, response):
+        # 处理question的answer
+        ans_json = json.loads(response.text)
+        is_end = ans_json['paging']['is_end']
+        totals_answer = ans_json['paging']['totals']
+        next_url = ans_json['paging']['next']
+
+        # 提取answer的具体字段
+        for answer in ans_json['data']:
+            answer_item = ZhihuAnswerItem()
+            answer_item['zhihu_id'] = answer['id']
+            answer_item['url'] = answer['url']
+            answer_item['question_id'] = answer['question']['id']
+            answer_item['author_id'] = answer['author']['id'] if 'id' in answer[
+                'author'] else None
+            answer_item[
+                'content'] = answer['content'] if 'content' in answer else None
+            answer_item['parise_num'] = answer['voteup_count']
+            answer_item['comments_num'] = answer['comment_count']
+            answer_item['create_time'] = answer['created_time']
+            answer_item['update_time'] = answer['updated_time']
+            answer_item['crawl_time'] = datetime.datetime.now()
+            yield answer_item
+
+        if not is_end:
+            yield scrapy.Request(next_url, callback=self.parse_answer)
+        pass
 
     def start_requests(self):
         chrome_option = Options()
@@ -79,6 +114,7 @@ class ZhihuSpider(scrapy.Spider):
         browser.get("https://www.zhihu.com/signin")
         login_success = False
         cookie_dict = {}
+        time.sleep(10)
         try:
             browser.find_element_by_css_selector(
                 ".SignFlow-accountInput.Input-wrapper input").send_keys(
