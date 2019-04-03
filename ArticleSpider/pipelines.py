@@ -21,6 +21,7 @@ from twisted.enterprise import adbapi
 
 
 class ArticlespiderPipeline(object):
+
     def process_item(self, item, spider):
         return item
 
@@ -59,10 +60,16 @@ class JsonExporterPipeline(object):
 
 
 class MysqlPipeline(object):
+
     def __init__(self):
         # 连接mysql数据库 MySQLdb.connect('host', 'user', 'password', 'dbname',charset='utf8')
         self.conn = MySQLdb.connect(
-            '127.0.0.1', 'root', 'root', 'article_spider', charset='utf8', use_unicode=True)
+            '127.0.0.1',
+            'root',
+            'root',
+            'article_spider',
+            charset='utf8',
+            use_unicode=True)
         self.cursor = self.conn.cursor()
 
     def process_item(self, item, spider):
@@ -72,11 +79,13 @@ class MysqlPipeline(object):
             VALUES(%s,%s,%s,%s)
         """
         self.cursor.execute(
-            insert_sql, (item["title"], item["url"], item["create_date"], item["fav_nums"]))
+            insert_sql,
+            (item["title"], item["url"], item["create_date"], item["fav_nums"]))
         self.conn.commit()
 
 
 class MysqlTwistedPipline(object):
+
     def __init__(self, dbpool):
         self.dbpool = dbpool
 
@@ -97,24 +106,21 @@ class MysqlTwistedPipline(object):
     def process_item(self, item, spider):
         # 使用twisted 将mysql插入变成异步执行
         query = self.dbpool.runInteraction(self.do_insert, item)
-        query.addErrback(self.handle_error)  # 处理异常
+        query.addErrback(self.handle_error, item, spider)  # 处理异常
 
-    def handle_error(self, failure):
+    def handle_error(self, failure, item, spider):
         # 处理异步插入的异常
         print(failure)
 
     def do_insert(self, cursor, item):
         # 具体插入逻辑
-        insert_sql = """
-            insert into jobbole_article(title,url,create_date,fav_nums,url_object_id,img_url,praise_nums,comments_nums,tags,content, img_path)
-            VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-          """
-        cursor.execute(
-            insert_sql, (item["title"], item["url"], item["create_date"], item["fav_nums"], item["url_object_id"], item["img_url"], item["praise_nums"], item["comments_nums"], item["tags"], item["content"], item['img_path']))
+        # 根据不同的item 构建不同的sql语句并插入到mysql中
+        insert_sql, params = item.get_insert_sql()
+        cursor.execute(insert_sql, params)
 
 
 class ArticleImagePipeline(ImagesPipeline):
-     # 从项目设置文件中导入图片下载路径
+    # 从项目设置文件中导入图片下载路径
     img_store = get_project_settings().get('IMAGES_STORE')
 
     # 重写ImagesPipeline类的此方法

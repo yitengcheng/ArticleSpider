@@ -8,8 +8,10 @@
 import scrapy
 import re
 import datetime
+from ArticleSpider.utils.common import get_nums
 from scrapy.loader import ItemLoader
 from scrapy.loader.processors import MapCompose, TakeFirst, Join
+from ArticleSpider.settings import SQL_DATETIME_FORMAT, SQL_DATE_FORMAT
 
 
 class ArticlespiderItem(scrapy.Item):
@@ -28,15 +30,6 @@ def date_convert(value):
     except:
         create_date = datetime.datetime.now().date()
     return create_date
-
-
-def get_nums(value):
-    match_re = re.match(r".*?(\d+).*", value)
-    if match_re:
-        nums = int(match_re.group(1))
-    else:
-        nums = 0
-    return nums
 
 
 def remove_comment_tags(value):
@@ -71,6 +64,17 @@ class JobBoleArticleItem(scrapy.Item):
         output_processor=Join(','))
     content = scrapy.Field()
 
+    def get_insert_sql(self):
+        insert_sql = """
+            insert into jobbole_article(title,url,create_date,fav_nums,url_object_id,img_url,praise_nums,comments_nums,tags,content, img_path)
+            VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+          """
+        params = (self["title"], self["url"], self["create_date"],
+                  self["fav_nums"], self["url_object_id"], self["img_url"],
+                  self["praise_nums"], self["comments_nums"], self["tags"],
+                  self["content"], self['img_path'])
+        return insert_sql, params
+
 
 class CaoLiuArticleItem(scrapy.Item):
     title = scrapy.Field()
@@ -91,6 +95,32 @@ class ZhihuQuestionItem(scrapy.Item):
     watch_user_num = scrapy.Field()
     click_num = scrapy.Field()
     crawl_time = scrapy.Field()
+
+    def get_insert_sql(self):
+        # 插入知乎question表的sql语句
+        insert_sql = """
+            insert into zhihu_question(zhihu_id,topics,url,title,content,answer_num,comments_num,watch_user_num,click_num,crawl_time)
+            VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+          """
+        zhihu_id = self['zhihu_id'][0]
+        topics = ','.join(self['topics'])
+        url = ''.join(self['url'])
+        title = ''.join(self['title'])
+        content = ''.join(self['content'])
+        answer_num = get_nums(''.join(self['answer_num']))
+        comments_num = get_nums(''.join(self['comments_num']))
+        crawl_time = datetime.datetime.now().strftime(SQL_DATETIME_FORMAT)
+
+        if len(self['watch_user_num']) == 2:
+            watch_user_num = int(self['watch_user_num'][0])
+            click_num = int(self['watch_user_num'][1])
+        else:
+            watch_user_num = int(self['watch_user_num'][0])
+            click_num = 0
+
+        params = (zhihu_id, topics, url, title, content, answer_num,
+                  comments_num, watch_user_num, click_num, crawl_time)
+        return insert_sql, params
 
 
 class ZhihuAnswerItem(scrapy.Item):
