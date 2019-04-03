@@ -11,6 +11,7 @@
 
 # here put the import lib
 import hashlib
+import re
 
 # MD5摘要生成
 
@@ -21,3 +22,13 @@ def get_md5(url):
     m = hashlib.md5()
     m.update(url)
     return m.hexdigest()
+
+
+def get_nums(value):
+    # 从字符串中截取数字
+    match_re = re.match(r".*?(\d+).*", value)
+    if match_re:
+        nums = int(match_re.group(1))
+    else:
+        nums = 0
+    return nums

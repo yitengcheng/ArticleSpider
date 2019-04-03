@@ -45,9 +45,9 @@ class ZhihuSpider(scrapy.Spider):
                     request_url,
                     callback=self.parse_question,
                     meta={'zhihu_id': question_id})
-            # else:
-            #     # 如果不是question页面则直接进一步跟踪
-            #     yield scrapy.Request(url)
+            else:
+                # 如果不是question页面则直接进一步跟踪
+                yield scrapy.Request(url)
 
     def parse_question(self, response):
         # 处理question页面，从页面中提取出具体的question item
