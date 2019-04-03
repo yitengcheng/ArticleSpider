@@ -70,9 +70,9 @@ DOWNLOADER_MIDDLEWARES = {
 ITEM_PIPELINES = {
     # 配置图片下载
     # scrapy.pipeline.images.ImagesPipeline为调用配置, 数值代表优先级
-    # 'scrapy.pipelines.images.ImagesPipeline': 1,
+    'scrapy.pipelines.images.ImagesPipeline': 1,
     # 'ArticleSpider.pipelines.ArticleImagePipeline': 300,
-    # 'ArticleSpider.pipelines.CaoLiuMysqlTwistedPipline': 400,
+    'ArticleSpider.pipelines.MysqlTwistedPipline': 300,
 }
 # 配置下载图片的url
 IMAGES_URLS_FIELD = "img_url"
@@ -110,3 +110,6 @@ MYSQL_HOST = '192.168.1.126'
 MYSQL_DBNAME = 'article_spider'
 MYSQL_USER = 'root'
 MYSQL_PASSWORD = 'root'
+
+SQL_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+SQL_DATE_FORMAT = '%Y-%m-%d'
