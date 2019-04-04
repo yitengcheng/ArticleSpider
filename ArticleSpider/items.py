@@ -135,3 +135,22 @@ class ZhihuAnswerItem(scrapy.Item):
     create_time = scrapy.Field()
     update_time = scrapy.Field()
     crawl_time = scrapy.Field()
+
+    def get_insert_sql(self):
+        # 插入知乎answer表的sql语句 如果这个id已经存在就更新数据
+        insert_sql = """
+            insert into zhihu_answer(zhihu_id,question_id,url,author_id,
+            content,parise_num,comments_num,create_time,update_time,
+            crawl_time)VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE content=VALUES(content), 
+            comments_num=VALUES(comments_num), parise_num=VALUES(parise_num),
+            update_time=VALUES(update_time)
+          """
+        create_time = datetime.datetime.fromtimestamp(
+            self['create_time']).strftime(SQL_DATETIME_FORMAT)
+        update_time = datetime.datetime.fromtimestamp(
+            self['update_time']).strftime(SQL_DATETIME_FORMAT)
+        params = (self['zhihu_id'], self['question_id'], self['url'],
+                  self['author_id'], self['content'], self['parise_num'],
+                  self['comments_num'], create_time, update_time,
+                  self['crawl_time'].strftime(SQL_DATETIME_FORMAT))
+        return insert_sql, params
