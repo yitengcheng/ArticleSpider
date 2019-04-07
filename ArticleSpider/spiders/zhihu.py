@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.options import Options
 import time
 from mouse import move, click
 import pickle
@@ -15,6 +12,8 @@ from scrapy.loader import ItemLoader
 from ArticleSpider.items import ZhihuAnswerItem, ZhihuQuestionItem
 import json
 import datetime
+from ArticleSpider.utils.common import get_browser
+from selenium.webdriver.common.keys import Keys
 
 
 class ZhihuSpider(scrapy.Spider):
@@ -100,13 +99,7 @@ class ZhihuSpider(scrapy.Spider):
         pass
 
     def start_requests(self):
-        chrome_option = Options()
-        chrome_option.add_argument('--disable-extensions')
-        chrome_option.add_experimental_option('debuggerAddress',
-                                              '127.0.0.1:9222')
-        browser = webdriver.Chrome(
-            executable_path='/usr/bin/chromedriver',
-            chrome_options=chrome_option)
+        browser = get_browser()
         try:
             browser.maximize_window()
         except:
