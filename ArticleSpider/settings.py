@@ -55,8 +55,9 @@ COOKIES_DEBUG = True
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    # 'ArticleSpider.middlewares.JSPageMiddleware' : 1,
+    # 'ArticleSpider.middlewares.JSPageMiddleware': 1,
     # 'ArticleSpider.middlewares.RandomUserAgentMiddleware' : 543,
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 2,
 }
 
 # Enable or disable extensions
@@ -70,7 +71,7 @@ DOWNLOADER_MIDDLEWARES = {
 ITEM_PIPELINES = {
     # 配置图片下载
     # scrapy.pipeline.images.ImagesPipeline为调用配置, 数值代表优先级
-    'scrapy.pipelines.images.ImagesPipeline': 1,
+    'scrapy.pipelines.images.ImagesPipeline': 200,
     # 'ArticleSpider.pipelines.ArticleImagePipeline': 300,
     'ArticleSpider.pipelines.MysqlTwistedPipline': 300,
 }
