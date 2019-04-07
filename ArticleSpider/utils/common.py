@@ -12,6 +12,9 @@
 # here put the import lib
 import hashlib
 import re
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
 
 # MD5摘要生成
 
@@ -32,3 +35,13 @@ def get_nums(value):
     else:
         nums = 0
     return nums
+
+
+# 生成selenium 浏览器对象
+def get_browser():
+    chrome_option = Options()
+    chrome_option.add_argument('--disable-extensions')
+    chrome_option.add_experimental_option('debuggerAddress', '127.0.0.1:9222')
+    browser = webdriver.Chrome(
+        executable_path='/usr/bin/chromedriver', chrome_options=chrome_option)
+    return browser
