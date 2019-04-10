@@ -7,6 +7,9 @@ from selenium.webdriver.common.keys import Keys
 import time
 import pickle
 import os
+from ArticleSpider.items import ArticleItemLoader, LagouJobItem
+from ArticleSpider.utils.common import get_md5
+from datetime import datetime
 
 
 class LagouSpider(CrawlSpider):
@@ -66,8 +69,29 @@ class LagouSpider(CrawlSpider):
 
     def parse_job(self, response):
         # 解析拉勾网的职位
-        item = {}
+        item_loader = ArticleItemLoader(item=LagouJobItem(), response=response)
         # item['domain_id'] = response.xpath('//input[@id="sid"]/@value').get()
         # item['name'] = response.xpath('//div[@id="name"]').get()
         # item['description'] = response.xpath('//div[@id="description"]').get()
-        return item
+        item_loader.add_css('title', '.job_name::attr(title)')
+        item_loader.add_value('url', response.url)
+        item_loader.add_value('url_object_id', get_md5(response.url))
+        item_loader.add_css('salary', '.job_request .salary::text')
+        item_loader.add_xpath(
+            'job_city', '/html/body/div[2]/div/div[1]/dd/p[1]/span[2]/text()')
+        item_loader.add_xpath(
+            'work_years', '/html/body/div[2]/div/div[1]/dd/p[1]/span[3]/text()')
+        item_loader.add_xpath(
+            'degree_need',
+            '/html/body/div[2]/div/div[1]/dd/p[1]/span[4]/text()')
+        item_loader.add_xpath(
+            'job_type', '/html/body/div[2]/div/div[1]/dd/p[1]/span[5]/text()')
+        item_loader.add_css('tags', '.position-label li::text')
+        item_loader.add_css('publish_time', '.publish_time::text')
+        item_loader.add_css('job_advantage', '.job-advantage p::text')
+        item_loader.add_css('job_desc', '.job-detail p')
+        item_loader.add_css('job_address', '.work_addr')
+        item_loader.add_css('company_name', '#job_company dt a img::attr(alt)')
+        item_loader.add_css('company_url', '#job_company dt a::attr(href)')
+        item_loader.add_value('crawl_time', datetime.now())
+        return item_loader.load_item()

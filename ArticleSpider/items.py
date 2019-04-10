@@ -154,3 +154,23 @@ class ZhihuAnswerItem(scrapy.Item):
                   self['comments_num'], create_time, update_time,
                   self['crawl_time'].strftime(SQL_DATETIME_FORMAT))
         return insert_sql, params
+
+
+class LagouJobItem(scrapy.Item):
+    # 拉钩网职位信息
+    title = scrapy.Field()
+    url = scrapy.Field()
+    url_object_id = scrapy.Field()
+    salary = scrapy.Field()
+    job_city = scrapy.Field()
+    work_years = scrapy.Field()
+    degree_need = scrapy.Field()
+    job_type = scrapy.Field()
+    publish_time = scrapy.Field()
+    job_advantage = scrapy.Field()
+    job_desc = scrapy.Field()
+    job_address = scrapy.Field()
+    company_name = scrapy.Field()
+    company_url = scrapy.Field()
+    tags = scrapy.Field()
+    crawl_time = scrapy.Field()
