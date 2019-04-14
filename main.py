@@ -2,7 +2,7 @@
 '''
 @File    :   main.py
 @Time    :   2019/02/02 10:14:03
-@Author  :   fan zehua 
+@Author  :   fan zehua
 @Version :   1.0
 @Contact :   316679581@qq.com
 @License :   (C)Copyright 2017-2018, Liugroup-NLPR-CASIA

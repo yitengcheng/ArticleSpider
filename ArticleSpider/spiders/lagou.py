@@ -73,7 +73,7 @@ class LagouSpider(CrawlSpider):
         # item['domain_id'] = response.xpath('//input[@id="sid"]/@value').get()
         # item['name'] = response.xpath('//div[@id="name"]').get()
         # item['description'] = response.xpath('//div[@id="description"]').get()
-        item_loader.add_css('title', '.job_name::attr(title)')
+        item_loader.add_css('title', '.job-name::attr(title)')
         item_loader.add_value('url', response.url)
         item_loader.add_value('url_object_id', get_md5(response.url))
         item_loader.add_css('salary', '.job_request .salary::text')
