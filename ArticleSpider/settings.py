@@ -18,6 +18,7 @@ NEWSPIDER_MODULE = 'ArticleSpider.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36'
+RANDOM_UA_TYPY = "random"
 
 # Obey robots.txt rules
 # ROBOTSTXT_OBEY = True
@@ -55,9 +56,10 @@ COOKIES_DEBUG = True
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    # 'ArticleSpider.middlewares.JSPageMiddleware': 1,
-    # 'ArticleSpider.middlewares.RandomUserAgentMiddleware' : 543,
-    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 2,
+    # 自定义user_agent
+    'ArticleSpider.middlewares.RandomUserAgentMiddleware': 2,
+    # scrapy自带user_agent,当使用自定义的时候自带的user_agent需设置为NONE
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
 }
 
 # Enable or disable extensions
