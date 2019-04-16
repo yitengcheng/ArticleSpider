@@ -42,6 +42,14 @@ def get_browser():
     chrome_option = Options()
     chrome_option.add_argument('--disable-extensions')
     chrome_option.add_experimental_option('debuggerAddress', '127.0.0.1:9222')
+    # 设置不加载图片
+    prefs = {"profile.managed_default_content_sttings.images": 2}
+    chrome_option.add_experimental_option("prefs", prefs)
     browser = webdriver.Chrome(
         executable_path='/usr/bin/chromedriver', chrome_options=chrome_option)
     return browser
+
+
+# phantomjs,无界面的浏览器， 多进程情况下性能下降严重
+def get_phantomjs_browser():
+    return webdriver.PhantomJS(executable_path='文件路径')
