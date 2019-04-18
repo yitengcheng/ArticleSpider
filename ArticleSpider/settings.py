@@ -59,6 +59,7 @@ DOWNLOADER_MIDDLEWARES = {
     # 自定义user_agent
     'ArticleSpider.middlewares.RandomUserAgentMiddleware': 2,
     'ArticleSpider.middlewares.RandomProxyMiddleware': 1,
+    # 'ArticleSpider.middlewares.JSPageMiddleware': 3,
     # scrapy自带user_agent,当使用自定义的时候自带的user_agent需设置为NONE
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
 }
