@@ -16,6 +16,7 @@ class JobboleSpider(scrapy.Spider):
 
     def __init__(self):
         self.browser = get_browser()
+        self.fail_urls = []
         super(JobboleSpider, self).__init__()
         dispatcher.connect(self.spider_closed, signals.spider_closed)
 
@@ -29,6 +30,9 @@ class JobboleSpider(scrapy.Spider):
         1. 获取文章列表页中的文章URL并交给scrapy下载后并进行解析
         2. 获取下一页的url并交给scrapy进行下载
         """
+        if response.status == 404:
+            self.fail_urls.append(response.url)
+            self.crawler.stats.inc_value('failed_url')
 
         # 获取文章列表页中的文章URL并交给scrapy下载后并进行解析
         # 获取标签属性需要使用伪类::attr(属性名)
