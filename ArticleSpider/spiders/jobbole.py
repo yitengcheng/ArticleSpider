@@ -4,13 +4,25 @@ from scrapy.http import Request
 from scrapy.loader import ItemLoader
 from urllib import parse
 from ArticleSpider.items import JobBoleArticleItem, ArticleItemLoader
-from ArticleSpider.utils.common import get_md5
+from ArticleSpider.utils.common import get_md5, get_browser
+from scrapy.xlib.pydispatch import dispatcher
+from scrapy import signals
 
 
 class JobboleSpider(scrapy.Spider):
     name = 'jobbole'
     allowed_domains = ['blog.jobbole.com']
     start_urls = ['http://blog.jobbole.com/all-posts/']  # 放入待爬取的所有url
+
+    def __init__(self):
+        self.browser = get_browser()
+        super(JobboleSpider, self).__init__()
+        dispatcher.connect(self.spider_closed, signals.spider_closed)
+
+    def spider_closed(self, spider):
+        # 当爬虫退出的时候关闭浏览器
+        print('spider close')
+        self.browser.quit()
 
     def parse(self, response):
         """

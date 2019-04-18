@@ -15,6 +15,7 @@ import re
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
+from pyvirtualdisplay import Display
 
 # MD5摘要生成
 
@@ -39,6 +40,9 @@ def get_nums(value):
 
 # 生成selenium 浏览器对象
 def get_browser():
+    # visible为0不显示界面
+    display = Display(visible=0, size=(800, 600))
+    display.start()
     chrome_option = Options()
     chrome_option.add_argument('--disable-extensions')
     chrome_option.add_experimental_option('debuggerAddress', '127.0.0.1:9222')
